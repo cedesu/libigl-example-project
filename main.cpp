@@ -14,8 +14,9 @@
 #include <igl/per_vertex_normals.h>
 #include <igl/point_mesh_squared_distance.h>
 #include <igl/signed_distance.h>
+#include <math.h>
 
-extern const int maxn=100;
+extern const int maxn=64;
 extern int cnt=0;
 
 double max(double a,double b,double c){
@@ -155,17 +156,19 @@ double max_distance = 1;
   printf("%f\n",(double)difftime(stop,start));
   
   int t=0,tt=0;
-  Eigen::MatrixXd O(X*Y*Z,3);
-  Eigen::VectorXd W(X*Y*Z);
-  for (int i=0; i<X; i++)
-    for (int j=0; j<Y; j++)
-      for (int k=0; k<Z; k++){
-      	O.row(i*Y*Z+j*Z+k)=min_cord+resolution*Eigen::RowVector3d(i,j,k);
+  Eigen::MatrixXd O(maxn*maxn*maxn,3);
+  Eigen::VectorXd W(maxn*maxn*maxn);
+  Eigen::RowVectorXd mid_cord=min_cord+resolution/2*Eigen::RowVector3d(X,Y,Z);
+  double pi=3.1415926;
+  for (int i=0; i<maxn; i++)
+    for (int j=0; j<maxn; j++)
+      for (int k=0; k<maxn; k++){
+      	O.row(i*maxn*maxn+j*maxn+k)=mid_cord+i*resolution*Eigen::RowVector3d(cos(k/maxn*pi-pi/2)*cos(j/maxn*2*pi),cos(k/maxn*pi-pi/2)*sin(j/maxn*2*pi),sin(k/maxn*pi-pi/2));
 	  }
     signed_distance_pseudonormal(O,V,F,tree,FN,VN,EN,EMAP,W,I,C,N);
   std::vector<double> voxel(maxn*maxn*maxn,10000);
   std::list<Eigen::RowVector3i> list;
-  int i1,j1,z1;
+  /*int i1,j1,z1;
   for (int i=0; i<X; i++){
     for (int j=0; j<Y; j++){
 	  for (int k=0; k<Z; k++)if (W(i*Y*Z+j*Z+k)<0){
@@ -177,16 +180,16 @@ double max_distance = 1;
 	  }
 	}
   }
-  fill(voxel,list);
+  fill(voxel,list);*/
   stop=time(NULL);
   printf("step2 %f %u\n",(double)difftime(stop,start),X*Y*Z);
-  std::string fo="../../Thingi10K/sdf_newnew/";
+  std::string fo="../../Thingi10K/sdf_polar/";
   fo=fo+fl.substr(0,fl.size()-3);
   fo=fo.substr(0,fo.size()-3)+"out";
   FILE *f=fopen(fo.c_str(),"w");
   //fprintf(f,"%d %d %d\n",X,Y,Z);
   for (int i=0; i<maxn*maxn*maxn; i++)
-  	fprintf(f,"%f ",voxel[i]);
+  	fprintf(f,"%f ",W(i));
   fclose(f);
 }}}
 
