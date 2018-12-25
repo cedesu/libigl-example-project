@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
   	printf("%s\n",x);
   	fl=x;
   	fi="../../Thingi10K/raw_meshes/"+fl; 
-  	if (j>=5000&&j<7500){
+  	if (j>=0&&j<2500){
   igl::readSTL(fi,V,F,N);
   //if ((F.rows()<50000)&&!(F.rows()<10000&&V.rows()<10000)){
 
@@ -189,7 +189,7 @@ double max_distance = 1;
   FILE *f=fopen(fo.c_str(),"w");
   //fprintf(f,"%d %d %d\n",X,Y,Z);
   for (int i=0; i<maxn*maxn*maxn; i++)
-  	fprintf(f,"%f ",W(i));
+  	fprintf(f,"%f ",W(i)/resolution);
   fclose(f);
 }}}
 
